@@ -1,2 +1,2 @@
-# N Body Sim
+# The N Body Problem
  

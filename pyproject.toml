@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "the_n_body_problem"
+version = "0.0.1"
+authors = [
+  {name="Joel Miller", email="joelsamiller@gmail.com" },
+]
+description = "Rewrite of 3rd year physics project. Simulates bodies interacting under gravity"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+]
