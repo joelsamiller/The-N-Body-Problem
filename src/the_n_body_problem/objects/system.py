@@ -1,8 +1,10 @@
 import numpy as np
+from scipy.spatial import distance
 from scipy.integrate import odeint
 
 from .body import Body
 from the_n_body_problem.physics import constants
+
 
 class System:
     def __init__(self, bodies: list[Body]):
@@ -22,26 +24,15 @@ class System:
             pos = np.array(y[0 : int(len(y) / 2)]).reshape((-1, 3))
             vel = np.array(y[int(len(y) / 2) : :]).reshape((-1, 3))
             # Calculate distance from each object to every other object
-            dist = [[p2 - p1 for p2 in pos if all(p1 != p2)] for p1 in pos]
-            # Calculate acceleration vector on each object
-            acc = np.array(
-                [
-                    [
-                        # Sum contributions from every body for each cardinal direction
-                        sum(
-                            constants.G
-                            * m
-                            * (dr[i] / np.sqrt(sum(d**2 for d in dr)) ** 3)
-                            for dr, m in zip(
-                                _dist, [m for m in mass[np.arange(len(mass)) != b]]
-                            )
-                        )
-                        for i in range(3)
-                    ]
-                    # For every body in the system
-                    for b, _dist in enumerate(dist)
-                ]
-            )
+            norm_dist = distance.cdist(pos, pos)
+            vector_dist = pos[:, None, :] - pos
+
+            acc = np.zeros((len(mass), 3))
+            for i in range(len(mass)):
+                a = -constants.G * mass * norm_dist[i]**-3
+                a[i] = 0
+                a = a @ vector_dist[i]
+                acc[i] = a
             # Flatten velocity and acceleration arrays and join as one list for output
             out = vel.ravel().tolist() + acc.ravel().tolist()
             return out
