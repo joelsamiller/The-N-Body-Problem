@@ -20,19 +20,18 @@ class System:
 
         # Define function to solve
         def newton(y, t, mass):
+            n = len(mass)
             # Reshape positions and velocites into a n x 3 array
             pos = np.array(y[0 : int(len(y) / 2)]).reshape((-1, 3))
             vel = np.array(y[int(len(y) / 2) : :]).reshape((-1, 3))
             # Calculate distance from each object to every other object
-            norm_dist = distance.cdist(pos, pos)
-            vector_dist = pos[:, None, :] - pos
-
-            acc = np.zeros((len(mass), 3))
-            for i in range(len(mass)):
-                a = -constants.G * mass * norm_dist[i]**-3
-                a[i] = 0
-                a = a @ vector_dist[i]
-                acc[i] = a
+            norm_dist = distance.cdist(pos, pos)  # ||x_i - x_j||
+            vector_dist = pos[:, None, :] - pos  # x_i - x_j
+            # Calculate coordinate invariate part of field matrix
+            a_mag = -constants.G * mass * norm_dist ** -3  # Gm/||r||^3
+            np.fill_diagonal(a_mag, 0)  # Set acceleration to 0 for i=j
+            # Multiply by displacement vector for each body
+            acc = np.array([a_mag[i] @ vector_dist[i] for i in range(n)])
             # Flatten velocity and acceleration arrays and join as one list for output
             out = vel.ravel().tolist() + acc.ravel().tolist()
             return out

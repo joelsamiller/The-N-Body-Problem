@@ -1,6 +1,7 @@
 import argparse
 import os
 from runpy import run_path
+from time import perf_counter
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -66,8 +67,10 @@ def main() -> None:
     print(f"    dt = {args.time_step}")
     print(f"    Number of time steps = {int(np.round(total_time / time_step))}")
     print("*" * 64)
+    t0 = perf_counter()
     system.solve(time_array)
-
+    t1 = perf_counter()
+    print(f"System solved in {t1 - t0:.1f} seconds")
     save_results(
         system,
         filename=os.path.join(
