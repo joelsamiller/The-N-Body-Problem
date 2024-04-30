@@ -25,14 +25,18 @@ class System:
             # Split positions and velocites into n x 3 arrays
             pos = u[k][0]
             vel = u[k][1]
+            
             # Calculate distance from each object to every other object
             norm_dist = distance.cdist(pos, pos)  # ||x_i - x_j||
             vector_dist = pos[:, None, :] - pos  # x_i - x_j
-            # Calculate coordinate invariate part of field matrix
-            a_mag = -constants.G * mass * norm_dist**-3  # Gm/||r||^3
-            np.fill_diagonal(a_mag, 0)  # Set acceleration to 0 for i=j
-            # Multiply by displacement vector for each body
-            acc = np.array([a_mag[i] @ vector_dist[i] for i in range(self.n)])
+            
+            # Calculate accelerations
+            inv_r3 = norm_dist**-3
+            np.fill_diagonal(inv_r3, 0)  # Set acceleration to 0 for i=j
+            Gr_r3 = -constants.G * vector_dist * inv_r3[:, :, None]  # Gr/||r||^3
+            # Multiply by mass vector for each direction
+            acc = np.array([Gr_r3[:, :, i] @ mass for i in range(3)]).T
+            
             # Join velocities and accelerations and return
             vel += dt * acc
             pos += dt * vel
@@ -41,4 +45,4 @@ class System:
         # Assign solutions for each body to its class
         for i, b in enumerate(self.bodies):
             b.path = u[:, 0, i, :]
-            b.pos = u[:, 0, -1, :]
+            b.pos = u[-1, 0, i, :]
