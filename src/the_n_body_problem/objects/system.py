@@ -1,9 +1,7 @@
 import numpy as np
-from scipy.spatial import distance
-from scipy.integrate import odeint
 
 from .body import Body
-from the_n_body_problem.physics import constants
+from the_n_body_problem.physics import equations
 
 
 class System:
@@ -26,18 +24,9 @@ class System:
             pos = u[k][0]
             vel = u[k][1]
             
-            # Calculate distance from each object to every other object
-            norm_dist = distance.cdist(pos, pos)  # ||x_i - x_j||
-            vector_dist = pos[:, None, :] - pos  # x_i - x_j
+            acc = equations.gravitational_acceleration(mass, pos)
             
-            # Calculate accelerations
-            inv_r3 = norm_dist**-3
-            np.fill_diagonal(inv_r3, 0)  # Set acceleration to 0 for i=j
-            Gr_r3 = -constants.G * vector_dist * inv_r3[:, :, None]  # Gr/||r||^3
-            # Multiply by mass vector for each direction
-            acc = np.array([Gr_r3[:, :, i] @ mass for i in range(3)]).T
-            
-            # Join velocities and accelerations and return
+            # Update velocities and positions
             vel += dt * acc
             pos += dt * vel
             u[k + 1] = np.stack([pos, vel])
