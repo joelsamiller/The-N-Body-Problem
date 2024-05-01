@@ -45,5 +45,8 @@ def main() -> None:
     ax.set(xlim=[-max_distance, max_distance], ylim=[-max_distance, max_distance])
 
     frames = np.arange(len(bodies[0].path))
-    ani = animation.FuncAnimation(fig, update, frames=frames[::120])
+    ani = animation.FuncAnimation(fig, update, frames=frames[::60])
     ani.save(os.path.join(outputs_directory, f"{filename}.mp4"), fps=args.fps, dpi=args.dpi, writer="ffmpeg")
+
+if __name__ == "__main__":
+    main()

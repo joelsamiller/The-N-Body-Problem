@@ -1,6 +1,7 @@
 import argparse
 import os
 from runpy import run_path
+from time import perf_counter
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -36,6 +37,7 @@ def main() -> None:
         description="Solve ODEs for a system of bodies interacting under gravity",
     )
     parser.add_argument("system_path")
+    parser.add_argument("-m", "--method", default="leapfrog")
     parser.add_argument("-t", "--time")
     parser.add_argument("-dt", "--time_step")
 
@@ -52,7 +54,7 @@ def main() -> None:
     
     total_time = np.round(int(args.time[0:-1]) * TIME_TO_SECONDS[time_unit])
     time_step = np.round(int(args.time_step[0:-1]) * TIME_TO_SECONDS[time_step_unit])
-    time_array = np.linspace(0, total_time, int(np.round(total_time / time_step)))
+    num_time_steps = int(np.round(total_time / time_step))
 
     system = System(
         [b for b in initial_conditions.values() if isinstance(b, Body)]
@@ -64,10 +66,12 @@ def main() -> None:
     print(f"    N = {len(system.bodies)}")
     print(f"    T = {args.time}")
     print(f"    dt = {args.time_step}")
-    print(f"    Number of time steps = {int(np.round(total_time / time_step))}")
+    print(f"    Number of time steps = {num_time_steps}")
     print("*" * 64)
-    system.solve(time_array)
-
+    t0 = perf_counter()
+    system.solve(dt=time_step, Nt=num_time_steps, method=args.method)
+    t1 = perf_counter()
+    print(f"System solved in {t1 - t0:.1f} seconds usign the {args.method.replace("_", " ")} method")
     save_results(
         system,
         filename=os.path.join(

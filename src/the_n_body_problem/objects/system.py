@@ -1,58 +1,99 @@
 import numpy as np
-from scipy.integrate import odeint
 
 from .body import Body
-from the_n_body_problem.physics import constants
+from the_n_body_problem.physics import equations
+
 
 class System:
     def __init__(self, bodies: list[Body]):
         self.bodies = bodies
+        self.n = len(bodies)
 
-    def solve(self, time: np.ndarray) -> None:
-        # Reshape positions and velocities into a single 1D list for ODE solver
-        pos = sum([list(b.pos) for b in self.bodies], [])
-        vel = sum([list(b.vel) for b in self.bodies], [])
-        pos_vel = pos + vel
+        self.methods = {
+            "forward_euler": self.forward_euler,
+            "leapfrog": self.leapfrog,
+        }
+
+    def solve(self, dt: int, Nt: int, method: str = "leapfrog") -> None:
+        # Create position, velocity and u arrays
+        pos = np.stack([b.pos for b in self.bodies])
+        vel = np.stack([b.vel for b in self.bodies])
         # Create a list of all body masses for solver
         mass = np.array([b.mass for b in self.bodies])
 
-        # Define function to solve
-        def newton(y, t, mass):
-            # Reshape positions and velocites into a n x 3 array
-            pos = np.array(y[0 : int(len(y) / 2)]).reshape((-1, 3))
-            vel = np.array(y[int(len(y) / 2) : :]).reshape((-1, 3))
-            # Calculate distance from each object to every other object
-            dist = [[p2 - p1 for p2 in pos if all(p1 != p2)] for p1 in pos]
-            # Calculate acceleration vector on each object
-            acc = np.array(
-                [
-                    [
-                        # Sum contributions from every body for each cardinal direction
-                        sum(
-                            constants.G
-                            * m
-                            * (dr[i] / np.sqrt(sum(d**2 for d in dr)) ** 3)
-                            for dr, m in zip(
-                                _dist, [m for m in mass[np.arange(len(mass)) != b]]
-                            )
-                        )
-                        for i in range(3)
-                    ]
-                    # For every body in the system
-                    for b, _dist in enumerate(dist)
-                ]
-            )
-            # Flatten velocity and acceleration arrays and join as one list for output
-            out = vel.ravel().tolist() + acc.ravel().tolist()
-            return out
+        u = self.methods[method](np.stack([pos, vel]), mass, dt, Nt)
 
-        # Solve ODE
-        solution = odeint(newton, pos_vel, time, (mass,))
         # Assign solutions for each body to its class
-        pos = [
-            [solution[i][3 * j : 3 * (j + 1)] for i in range(len(time))]
-            for j in range(len(self.bodies))
-        ]
         for i, b in enumerate(self.bodies):
-            b.path = pos[i]
-            b.pos = pos[i][-1]
+            b.path = u[:, 0, i, :]
+            b.pos = u[-1, 0, i, :]
+
+    @staticmethod
+    def forward_euler(u0: np.ndarray, mass: np.ndarray, dt: int, Nt: int) -> np.ndarray:
+        """
+        Use the forward Euler method to solve the equations of motion for the system.
+
+        Parameters:
+            u0 (np.ndarray): Initial conditions array.
+            mass (np.ndarray): 1 x N array containing the mass of each object.
+            dt (int): The time step in seconds.
+            Nt (int): The total number of time steps.
+
+        Returns:
+            np.ndarray: Nt x 2 x N x 3 array containing the positions and velocities of each object
+                        at each time step, in the x, y and z directions.
+        """
+        u = np.zeros((Nt,) + u0.shape)
+        u[0] = u0
+
+        for k in range(Nt - 1):
+            # Split positions and velocites into n x 3 arrays
+            pos = u[k][0]
+            vel = u[k][1]
+
+            # Calculate accelerations
+            acc = equations.gravitational_acceleration(mass, pos)
+
+            # Update velocities and positions
+            vel += dt * acc
+            pos += dt * vel
+            u[k + 1] = np.stack([pos, vel])
+
+        return u
+
+    @staticmethod
+    def leapfrog(u0: np.ndarray, mass: np.ndarray, dt: int, Nt: int) -> np.ndarray:
+        """
+        Use the leapfrog method to solve the equations of motion for the system.
+
+        Parameters:
+            u0 (np.ndarray): Initial conditions array.
+            mass (np.ndarray): 1 x N array containing the mass of each object.
+            dt (int): The time step in seconds.
+            Nt (int): The total number of time steps.
+
+        Returns:
+            np.ndarray: Nt x 2 x N x 3 array containing the positions and velocities of each object
+                        at each time step, in the x, y and z directions.
+        """
+        u = np.zeros((Nt,) + u0.shape)
+        u[0] = u0
+        # Calculate initial acceleration
+        acc = equations.gravitational_acceleration(mass, u[0][0])
+
+        for k in range(Nt - 1):
+            # Split positions and velocites into n x 3 arrays
+            pos = u[k][0]
+            vel = u[k][1]
+            
+            vel += acc * dt / 2  # Kick
+            pos += vel * dt  # Drift
+
+            # Calculate accelerations
+            acc = equations.gravitational_acceleration(mass, pos)
+
+            vel += acc * dt / 2  # Kick
+
+            u[k + 1] = np.stack([pos, vel])
+
+        return u
