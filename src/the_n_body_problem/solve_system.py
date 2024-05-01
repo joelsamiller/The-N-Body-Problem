@@ -37,6 +37,7 @@ def main() -> None:
         description="Solve ODEs for a system of bodies interacting under gravity",
     )
     parser.add_argument("system_path")
+    parser.add_argument("-m", "--method", default="leapfrog")
     parser.add_argument("-t", "--time")
     parser.add_argument("-dt", "--time_step")
 
@@ -68,9 +69,9 @@ def main() -> None:
     print(f"    Number of time steps = {int(np.round(total_time / time_step))}")
     print("*" * 64)
     t0 = perf_counter()
-    system.solve(time_array)
+    system.solve(time_array, method=args.method)
     t1 = perf_counter()
-    print(f"System solved in {t1 - t0:.1f} seconds")
+    print(f"System solved in {t1 - t0:.1f} seconds usign the {args.method.replace("_", " ")} method")
     save_results(
         system,
         filename=os.path.join(

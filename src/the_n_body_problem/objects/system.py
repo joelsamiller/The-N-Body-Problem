@@ -9,7 +9,12 @@ class System:
         self.bodies = bodies
         self.n = len(bodies)
 
-    def solve(self, time: np.ndarray) -> None:
+        self.methods = {
+            "forward_euler": self.forward_euler,
+            "leapfrog": self.leapfrog,
+        }
+
+    def solve(self, time: np.ndarray, method: str = "leapfrog") -> None:
         # Create position, velocity and u arrays
         pos = np.stack([b.pos for b in self.bodies])
         vel = np.stack([b.vel for b in self.bodies])
@@ -18,7 +23,7 @@ class System:
         # Get the timestep
         dt = int(time[-1] / len(time))
 
-        u = self.forward_euler(np.stack([pos, vel]), mass, dt, len(time))
+        u = self.methods[method](np.stack([pos, vel]), mass, dt, len(time))
 
         # Assign solutions for each body to its class
         for i, b in enumerate(self.bodies):
@@ -54,6 +59,43 @@ class System:
             # Update velocities and positions
             vel += dt * acc
             pos += dt * vel
+            u[k + 1] = np.stack([pos, vel])
+
+        return u
+
+    @staticmethod
+    def leapfrog(u0: np.ndarray, mass: np.ndarray, dt: int, Nt: int) -> np.ndarray:
+        """
+        Use the leapfrog method to solve the equations of motion for the system.
+
+        Parameters:
+            u0 (np.ndarray): Initial conditions array.
+            mass (np.ndarray): 1 x N array containing the mass of each object.
+            dt (int): The time step in seconds.
+            Nt (int): The total number of time steps.
+
+        Returns:
+            np.ndarray: Nt x 2 x N x 3 array containing the positions and velocities of each object
+                        at each time step, in the x, y and z directions.
+        """
+        u = np.zeros((Nt,) + u0.shape)
+        u[0] = u0
+        # Calculate initial acceleration
+        acc = equations.gravitational_acceleration(mass, u[0][0])
+
+        for k in range(Nt - 1):
+            # Split positions and velocites into n x 3 arrays
+            pos = u[k][0]
+            vel = u[k][1]
+            
+            vel += acc * dt / 2  # Kick
+            pos += vel * dt  # Drift
+
+            # Calculate accelerations
+            acc = equations.gravitational_acceleration(mass, pos)
+
+            vel += acc * dt / 2  # Kick
+
             u[k + 1] = np.stack([pos, vel])
 
         return u
