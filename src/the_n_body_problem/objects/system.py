@@ -14,16 +14,14 @@ class System:
             "leapfrog": self.leapfrog,
         }
 
-    def solve(self, time: np.ndarray, method: str = "leapfrog") -> None:
+    def solve(self, dt: int, Nt: int, method: str = "leapfrog") -> None:
         # Create position, velocity and u arrays
         pos = np.stack([b.pos for b in self.bodies])
         vel = np.stack([b.vel for b in self.bodies])
         # Create a list of all body masses for solver
         mass = np.array([b.mass for b in self.bodies])
-        # Get the timestep
-        dt = int(time[-1] / len(time))
 
-        u = self.methods[method](np.stack([pos, vel]), mass, dt, len(time))
+        u = self.methods[method](np.stack([pos, vel]), mass, dt, Nt)
 
         # Assign solutions for each body to its class
         for i, b in enumerate(self.bodies):
