@@ -1,0 +1,11 @@
+- Test Body A:
+    mass: 1.0
+    pos: [1.0, 2.0, 3.0]
+    vel: [4.0, 5.0, 6.0]
+    colour: 'black'
+
+- Test Body B:
+    mass: 2.0
+    pos: [2.0, 3.0, 4.0]
+    vel: [5.0, 6.0, 7.0]
+    colour: 'white'
