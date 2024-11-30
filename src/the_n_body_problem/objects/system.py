@@ -1,4 +1,5 @@
 import numpy as np
+import yaml
 
 from .body import Body
 from the_n_body_problem.physics import equations
@@ -13,6 +14,13 @@ class System:
             "forward_euler": self.forward_euler,
             "leapfrog": self.leapfrog,
         }
+
+    @classmethod
+    def from_yaml(cls, filename):
+        with open(filename, "r") as f:
+            data = yaml.safe_load(f)
+        
+        return cls([Body.from_dict(b) for b in data])
 
     def solve(self, dt: int, Nt: int, method: str = "leapfrog") -> None:
         # Create position, velocity and u arrays

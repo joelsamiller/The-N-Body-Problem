@@ -8,3 +8,9 @@ class Body:
         self.vel = np.array(vel)
         self.colour = colour
         self.path = []
+    
+    @classmethod
+    def from_dict(cls, data):
+        name = [*data][0]
+        data = data[name]
+        return cls(data["mass"], data["pos"], data["vel"], data["colour"])
