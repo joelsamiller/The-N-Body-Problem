@@ -43,7 +43,7 @@ def test_system_from_yaml():
     npt.assert_array_equal(test_body_a.vel, np.array([4.0, 5.0, 6.0]))
     assert test_body_a.colour == "black"
 
-    assert test_body_b.mass == 2.0
-    npt.assert_array_equal(test_body_b.pos, np.array([2.0, 3.0, 4.0]))
-    npt.assert_array_equal(test_body_b.vel, np.array([5.0, 6.0, 7.0]))
+    assert test_body_b.mass == 2e1
+    npt.assert_array_equal(test_body_b.pos, np.array([2e0, 3e1, -4e1]))
+    npt.assert_array_equal(test_body_b.vel, np.array([-5.0, 6.0, 7.0]))
     assert test_body_b.colour == "white"

@@ -5,7 +5,7 @@
     colour: 'black'
 
 - Test Body B:
-    mass: 2.0
-    pos: [2.0, 3.0, 4.0]
-    vel: [5.0, 6.0, 7.0]
+    mass: 2.0e+1
+    pos: [2e0, 3e1, -4e1]
+    vel: [-5.0, 6.0, 7.0]
     colour: 'white'
