@@ -19,7 +19,7 @@ class System:
     def from_yaml(cls, filename):
         with open(filename, "r") as f:
             data = yaml.safe_load(f)
-        
+
         return cls([Body.from_dict(b) for b in data])
 
     def solve(self, dt: int, Nt: int, method: str = "leapfrog") -> None:
@@ -93,7 +93,7 @@ class System:
             # Split positions and velocites into n x 3 arrays
             pos = u[k][0]
             vel = u[k][1]
-            
+
             vel += acc * dt / 2  # Kick
             pos += vel * dt  # Drift
 

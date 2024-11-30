@@ -32,21 +32,28 @@ def main() -> None:
     def update(i):
         ax.clear()
         ax.set(xlim=[-max_distance, max_distance], ylim=[-max_distance, max_distance])
-        ax.axis('equal')
-        trail_start = max(0, i-1000)
+        ax.axis("equal")
+        trail_start = max(0, i - 1000)
         for b in range(len(bodies)):
-            plt.plot(paths[b, 0, trail_start:i],
-                        paths[b, 1, trail_start:i], c=colours[b])
+            plt.plot(
+                paths[b, 0, trail_start:i], paths[b, 1, trail_start:i], c=colours[b]
+            )
         plt.scatter(paths[:, 0, i], paths[:, 1, i], c=colours)
 
     fig = plt.figure()
     ax = fig.gca()
-    ax.axis('equal')
+    ax.axis("equal")
     ax.set(xlim=[-max_distance, max_distance], ylim=[-max_distance, max_distance])
 
     frames = np.arange(len(bodies[0].path))
     ani = animation.FuncAnimation(fig, update, frames=frames[::60])
-    ani.save(os.path.join(outputs_directory, f"{filename}.mp4"), fps=args.fps, dpi=args.dpi, writer="ffmpeg")
+    ani.save(
+        os.path.join(outputs_directory, f"{filename}.mp4"),
+        fps=args.fps,
+        dpi=args.dpi,
+        writer="ffmpeg",
+    )
+
 
 if __name__ == "__main__":
     main()

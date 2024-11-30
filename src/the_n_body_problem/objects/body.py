@@ -8,7 +8,7 @@ class Body:
         self.vel = np.array(vel)
         self.colour = colour
         self.path = []
-    
+
     @classmethod
     def from_dict(cls, data):
         name = [*data][0]
