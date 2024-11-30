@@ -1,5 +1,6 @@
 import numpy as np
 import yaml
+from typing import Self
 
 from .body import Body
 from the_n_body_problem.physics import equations
@@ -16,7 +17,7 @@ class System:
         }
 
     @classmethod
-    def from_yaml(cls, filename):
+    def from_yaml(cls, filename: str) -> Self:
         with open(filename, "r") as f:
             data = yaml.safe_load(f)
 

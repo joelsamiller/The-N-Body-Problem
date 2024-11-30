@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Self
 
 
 class Body:
@@ -10,7 +11,7 @@ class Body:
         self.path = []
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: dict) -> Self:
         name = [*data][0]
         data = data[name]
         return cls(data["mass"], data["pos"], data["vel"], data["colour"])
