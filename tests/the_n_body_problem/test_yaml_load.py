@@ -54,6 +54,12 @@ def test_body_from_dict_bad_dict():
     )
 
 
+def test_body_from_dict_bad_type():
+    with pytest.raises(TypeError) as e:
+        _ = Body.from_dict(["name", "mass", "pos"])
+    assert str(e.value) == "Agument passed to Body.from_dict() must be of type dict"
+
+
 def test_system_from_yaml():
     test_system = System.from_yaml(
         os.path.join(TEST_DIR, "data", "test_system_yaml.yaml")
