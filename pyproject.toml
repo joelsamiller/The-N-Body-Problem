@@ -21,3 +21,6 @@ dependencies = [
   "matplotlib",
   "pyyaml",
 ]
+
+[project.optional-dependencies]
+dev = ["pytest"]
