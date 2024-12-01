@@ -19,4 +19,8 @@ dependencies = [
   "numpy",
   "scipy",
   "matplotlib",
+  "pyyaml",
 ]
+
+[project.optional-dependencies]
+dev = ["pytest"]

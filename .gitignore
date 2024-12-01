@@ -1,3 +1,5 @@
+.vscode/
+
 *.npy
 *.mp4
 *.gif

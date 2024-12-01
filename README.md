@@ -1,5 +1,5 @@
 # The N-Body Problem
- 
+
 This repository contains Python code which will simulate a number of objects interacting via gravity as described by Newton's law of gravitation.
 
 ## Background
@@ -16,11 +16,11 @@ where $r_i$ is the position vector of object $i$. This can then be written as a 
 
 $\frac{du}{dt} = f(u, t)$,
 
-where, 
+where,
 ```math
 u = \begin{bmatrix}v\\r\end{bmatrix},
 ```
-and, 
+and,
 ```math
 f(u, t) = \begin{bmatrix}-G \sum\limits_{j=0}^N \frac{m_j}{|\mathrm{r}_{ij}|^3}\mathrm{r}_{ij}\\v\end{bmatrix}.
 ```
@@ -37,7 +37,7 @@ $r_{i+1}=r_i+v_{i+1/2}\Delta t$\
 $v_{i+1}=v_{i+1/2}+a_{i+1}\frac{\Delta t}{2}$
 
 ## Running a simulation
-The initial conditions for the simulation should be specified as a series of `Body` class instances in a Python script named `initial_conditions.py` within a named directory (see the `sol` directory included in the repo for an example). 
+The initial conditions for the simulation should be specified as a series of `Body` class instances in a Python script named `initial_conditions.py` within a named directory (see the `sol` directory included in the repo for an example).
 The simulation can then be run using the following command structure:\
 `python src/the_n_body_problem/solve_system.py <path/to/directory> -t <total time to solve for> -dt <time step> -m <integration method>`
 
@@ -45,4 +45,3 @@ The final orbits will be plotted in a window and the data saved to the `outputs`
 
 An animation of the simulation can then be rendered using the following command structure:\
 `python src/the_n_body_problem/render_animation.py <path/to/output/file> -f <fps> -d <dpi>`
- 

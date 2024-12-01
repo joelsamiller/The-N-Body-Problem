@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial import distance
 
-from . import constants
+from the_n_body_problem.physics import constants
 
 
 def gravitational_acceleration(mass: np.ndarray, position: np.ndarray) -> np.ndarray:
