@@ -1,7 +1,9 @@
 import os
+import textwrap
 
 import numpy as np
 import numpy.testing as npt
+import pytest
 
 from the_n_body_problem.objects import Body, System
 
@@ -25,6 +27,31 @@ def test_body_from_dict():
     npt.assert_array_equal(body.vel, np.array([4.0, 5.0, 6.0]))
     assert body.colour == "black"
     assert body.path == []
+
+
+def test_body_from_dict_bad_dict():
+    body_data = {
+        "mass": 1.0,
+        "pos": [1.0, 2.0, 3.0],
+        "vel": [4.0, 5.0, 6.0],
+        "colour": "black",
+    }
+
+    with pytest.raises(ValueError) as e:
+        _ = Body.from_dict(body_data)
+    assert str(e.value) == textwrap.dedent(
+        """
+            Invalid dict format - dict must be of format,
+            {
+                "Body Name": {
+                    "mass": float,
+                    "pos": [float, float, float],
+                    "vel": [float, float, float],
+                    "colour": str,
+                }
+            }
+        """
+    )
 
 
 def test_system_from_yaml():
