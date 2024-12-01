@@ -34,6 +34,7 @@ def test_system_from_yaml():
 
     assert isinstance(test_system, System)
     assert all([isinstance(b, Body) for b in test_system.bodies])
+    assert test_system.n == 2
 
     test_body_a = test_system.bodies[0]
     test_body_b = test_system.bodies[1]
