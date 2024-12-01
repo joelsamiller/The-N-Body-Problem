@@ -2,7 +2,7 @@ import numpy as np
 import yaml
 from typing import Self
 
-from .body import Body
+from the_n_body_problem.objects import Body
 from the_n_body_problem.physics import equations
 
 
