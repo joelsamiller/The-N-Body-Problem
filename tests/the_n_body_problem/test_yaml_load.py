@@ -57,7 +57,22 @@ def test_body_from_dict_bad_dict():
 def test_body_from_dict_bad_type():
     with pytest.raises(TypeError) as e:
         _ = Body.from_dict(["name", "mass", "pos"])
-    assert str(e.value) == "Agument passed to Body.from_dict() must be of type dict"
+    assert str(e.value) == "Argument passed to Body.from_dict() must be of type dict"
+
+
+def test_body_from_dict_missing_properties():
+    body_data = {
+        "Test Body": {
+            "mass": 1.0,
+            "pos": [1.0, 2.0, 3.0],
+            "colour": "black",
+        }
+    }
+
+    with pytest.raises(ValueError) as e:
+        _ = Body.from_dict(body_data)
+
+    assert str(e.value) == "Body 'Test Body' missing required properties {'vel'}"
 
 
 def test_system_from_yaml():
